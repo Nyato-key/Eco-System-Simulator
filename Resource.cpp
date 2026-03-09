@@ -21,7 +21,7 @@ void Resource::Draw() const {
         DrawCircleV(position, Config::FOOD_RADIUS, Fade(RED, 0.95f));
         DrawCircleLines(position.x, position.y, Config::FOOD_RADIUS, MAROON);
         
-        // Add a small stem
+        // Optional: Add a small stem
         DrawRectangle(position.x - 1, position.y - Config::FOOD_RADIUS - 3, 2, 4, BROWN);
     }
 }

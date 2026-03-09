@@ -2,6 +2,7 @@
 #include "Grub.h"
 #include "Config.h"
 
+// Add PI definition if not available from raymath
 #ifndef PI
     #define PI 3.14159265358979323846f
 #endif
@@ -20,6 +21,7 @@ Grub::Grub() {
     reproCooldown = 0.0f;
     flashTimer = 0;
     
+    // NEW: Initialize target system
     hasTarget = false;
     targetTimer = 0.0f;
     
@@ -39,6 +41,7 @@ Grub::Grub(Vector2 pos, float s, float sightR, float metab, float mutChance) {
     reproCooldown = 0.0f;
     flashTimer = 0;
     
+    // NEW: Initialize target system
     hasTarget = false;
     targetTimer = 0.0f;
     
@@ -51,7 +54,7 @@ Grub::Grub(Vector2 pos, float s, float sightR, float metab, float mutChance) {
 }
 
 void Grub::InitializeColor() {
-    // Change to lime color
+    // Change to lime color instead of trait-based coloring
     baseColor = LIME;
     drawColor = baseColor;
 }
@@ -83,22 +86,66 @@ void Grub::SetRandomTarget() {
     hasTarget = true;
     targetTimer = 0.0f;
 }
+void Grub::ApplyBounds(int envW, int envH) {
+    
+    const float bounceFactor = 0.9f;
+    bool hitBoundary = false;
+    
+    // Standard boundary check with bounce
+    if (position.x < size) { 
+        position.x = size; 
+        velocity.x = fabsf(velocity.x) * bounceFactor;
+        hitBoundary = true;
+    }
+    if (position.y < size) { 
+        position.y = size; 
+        velocity.y = fabsf(velocity.y) * bounceFactor;
+        hitBoundary = true;
+    }
+    if (position.x > envW - size) { 
+        position.x = envW - size; 
+        velocity.x = -fabsf(velocity.x) * bounceFactor;
+        hitBoundary = true;
+    }
+    if (position.y > envH - size) { 
+        position.y = envH - size; 
+        velocity.y = -fabsf(velocity.y) * bounceFactor;
+        hitBoundary = true;
+    }
+    
+    // If hit boundary, immediately get new target
+    if (hitBoundary) {
+        hasTarget = false;  // Force new target in next Wander call
+        targetTimer = TARGET_CHANGE_INTERVAL;  // Force immediate target change
+    }
+}
 
-void Grub::Wander(float dt) {
-    // If no target or target reached, set new random target
+// Update Wander to avoid edges:
+void Grub::Wander(float dt, int envW, int envH) {
+    // Add edge avoidance
+    envW = 1200, envH = 800;  // Default, should match simulation
+    
+    // If very close to edge, set target away from edge
+    float dangerZone = 10.0f;
+    if (position.x < dangerZone || position.x > envW - dangerZone ||
+        position.y < dangerZone || position.y > envH - dangerZone) {
+        // Force new target away from edge
+        hasTarget = false;
+        targetTimer = TARGET_CHANGE_INTERVAL;
+    }
+    
+    // Original wander logic
     if (!hasTarget || targetTimer >= TARGET_CHANGE_INTERVAL) {
         SetRandomTarget();
     }
     
-    // Move toward current target
     if (hasTarget) {
         MoveTowards(targetPosition, dt);
         targetTimer += dt;
         
-        // Check if close to target
         float distToTarget = Vector2Distance(position, targetPosition);
-        if (distToTarget < 5.0f) {  // Close enough
-            SetRandomTarget();  // Get new target
+        if (distToTarget < 10.0f) {
+            SetRandomTarget();
         }
     }
 }
@@ -107,36 +154,20 @@ void Grub::ClearTarget() {
     hasTarget = false;
     targetTimer = 0.0f;
 }
-
-void Grub::ApplyBounds(int envW, int envH) {
-    const float bounceFactor = 0.8f;
-    if (position.x < size) { 
-        position.x = size; 
-        velocity.x = fabsf(velocity.x) * bounceFactor; 
-    }
-    if (position.y < size) { 
-        position.y = size; 
-        velocity.y = fabsf(velocity.y) * bounceFactor; 
-    }
-    if (position.x > envW - size) { 
-        position.x = envW - size; 
-        velocity.x = -fabsf(velocity.x) * bounceFactor; 
-    }
-    if (position.y > envH - size) { 
-        position.y = envH - size; 
-        velocity.y = -fabsf(velocity.y) * bounceFactor; 
-    }
-}
-
+// In Grub.cpp UpdateBars method:
 void Grub::UpdateBars(float fixedStep) {
-    // Current base drain
+    // BASE DRAIN = Metabolism × Time
+
+    // Example: If metabolism = 0.1
+    // baseDrain = 0.1 × 0.0167 × 0.1 = 0.000167 per frame
+    // That's how much hunger/thirst is lost JUST FOR EXISTING
     float baseDrain = metabolism * fixedStep * 0.1f;
+
+    // Adjust move cost for higher speeds - REDUCED cost
+    float moveCost = Vector2Length(velocity) * 0.001f * fixedStep;
     
-    // Move cost for higher speeds
-    float moveCost = Vector2Length(velocity) * 0.001f * fixedStep; // Reduced from 0.005f
-    
-    // Speed cost
-    float speedCost = speed * 0.00005f * fixedStep; // Reduced from 0.001f
+    // Speed cost - adjust for higher speeds
+    float speedCost = speed * 0.00005f * fixedStep;
     
     // Sight cost
     float sightCost = sight * Config::THIRST_COST_PER_SIGHT * fixedStep;

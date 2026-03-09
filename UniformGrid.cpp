@@ -1,6 +1,7 @@
 // UniformGrid.cpp
 #include "UniformGrid.h"
 #include "Utils.h"
+#include <set> // Optional: for duplicate prevention
 
 void UniformGrid::Init(int envWidth, int envHeight, float cs) {
     width = envWidth; 
@@ -32,7 +33,7 @@ void UniformGrid::CollectCandidates(float cx, float cy, float r, std::vector<int
     int top = clampVal(int((cy - r) / cellSize), 0, rows - 1);
     int bottom = clampVal(int((cy + r) / cellSize), 0, rows - 1);
     
-    // Reserve space for performance
+    // Optional: Reserve space for performance
     int estimatedCells = (right - left + 1) * (bottom - top + 1);
     int estimatedItems = estimatedCells * 10; // Rough estimate
     out.reserve(out.size() + estimatedItems);
@@ -44,4 +45,9 @@ void UniformGrid::CollectCandidates(float cx, float cy, float r, std::vector<int
             out.insert(out.end(), cell.begin(), cell.end());
         }
     }
+    
+    // Optional: Remove duplicates if objects can span multiple cells
+    // This is more expensive but ensures uniqueness
+    // std::set<int> unique(out.begin(), out.end());
+    // out.assign(unique.begin(), unique.end());
 }

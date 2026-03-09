@@ -10,7 +10,7 @@ void initRNG() {
     rng.seed(seed);
 }
 
-// For reproducible results with a fixed seed
+// Optional: For reproducible results with a fixed seed
 void initRNG(unsigned seed) {
     rng.seed(seed);
 }

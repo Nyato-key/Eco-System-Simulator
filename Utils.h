@@ -2,8 +2,9 @@
 #pragma once
 #include <random>
 #include <algorithm>
-#include <cmath>
+#include <cmath>  // Add this for M_PI
 
+// Use M_PI if not defined (Windows compatibility)
 #ifndef M_PI
     #define M_PI 3.14159265358979323846
 #endif
@@ -13,7 +14,7 @@ extern std::mt19937 rng;
 
 // Initialize RNG
 void initRNG();
-void initRNG(unsigned seed); // for reproducible results
+void initRNG(unsigned seed); // Optional: for reproducible results
 
 // Utility functions
 inline float randFloat(float a, float b) {

@@ -15,7 +15,7 @@ struct UniformGrid {
     void Insert(int id, float x, float y);
     void CollectCandidates(float cx, float cy, float r, std::vector<int>& out) const;
     
-    // Add bounds checking helper
+    // Optional: Add bounds checking helper
     bool IsPositionValid(float x, float y) const {
         return x >= 0 && x < width && y >= 0 && y < height;
     }
