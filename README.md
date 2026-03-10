@@ -1,6 +1,7 @@
 # Eco-System-Simulator
+
 **Full Changelog**: https://github.com/Nyato-key/Eco-System-Simulator/commits/Simulator
-# Eco-System-Simulator 
+
 ### _Simulation of Natural Selection_
 The Digital Organism Ecosystem Simulation is designed to vividly demonstrate how evolutionary dynamics unfold in a controlled, interactive virtual environment. In it, digital organisms must secure resources and adapt to environmental constraints, revealing the essential drivers of evolutionary change. The primary objective of the project is to develop an accessible, scientifically sound simulation that illustrates natural selection, resource competition, and genetic inheritance. By observing evolving populations and manipulating environmental conditions, users gain direct insight into the mechanisms driving evolution and ecosystem dynamics. Through sophisticated data tracking and visualization, the project captures the emergent behaviors and evolutionary trends that develop from simple initial conditions. The simulation serves as both an educational tool for understanding population dynamics and an experimental platform for testing how various factors influence evolutionary pathways in constrained ecosystems
 
